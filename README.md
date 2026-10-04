@@ -1,26 +1,24 @@
-# posix-web-server
+# C Web Server from Scratch
 
-A simple HTTP web server written from scratch in C on Linux (WSL). This project uses raw POSIX socket system calls to handle TCP connections and process HTTP requests without external libraries.
+Instead of just spinning up a Python or Express server, I wanted to build one from the ground up in C on Linux (WSL) to see what's actually happening at the OS level.
+
+No external libraries or frameworks—just raw C and POSIX socket system calls.
 
 ## How It Works
 
-The server follows the standard Linux socket lifecycle:
+When you hit `localhost:8080` in your browser, here's the exact lifecycle:
 
-1. **`socket()`** – Allocates an IPv4 TCP socket resource (returns File Descriptor `3`).
-2. **`bind()`** – Assigns host address `0.0.0.0` and port `8080` to the socket using `struct sockaddr_in` and `htons()`.
-3. **`listen()`** – Marks the socket as passive, setting a connection backlog queue of 10.
-4. **`accept()`** – Blocks until a client connects, then spawns a dedicated client file descriptor (`4`).
-5. **`read()` & `write()`** – Reads raw HTTP headers sent by the browser and responds with an HTTP/1.1 200 OK header and HTML payload.
+1. **`socket()`** – Asks the kernel to allocate an IPv4 TCP socket (gives back File Descriptor `3`).
+2. **`bind()`** – Ties that socket handle to `0.0.0.0:8080` using `struct sockaddr_in` (and `htons()` so network byte order doesn't flip the port).
+3. **`listen()`** – Tells the OS to start listening for incoming connections with a backlog queue of 10.
+4. **`accept()`** – Pauses execution until a connection arrives, then spawns a dedicated client handle (`4`) for that line.
+5. **`read()` & `write()`** – Captures the raw HTTP request header sent by the browser, then streams back an `HTTP/1.1 200 OK` header with an HTML response.
 
-## Building and Running
+## Running It
 
-### Prerequisites
-* GCC compiler
-* Linux / WSL environment (`build-essential`)
+You'll need `gcc` installed in a Linux environment or WSL.
 
-### Quickstart
-
-1. Clone the repository:
+1. **Clone the repo:**
    ```bash
-   git clone [https://github.com/Ctrl-Yam/posix-web-server.git](https://github.com/Ctrl-Yam/posix-web-server.git)
-   cd posix-web-server
+   git clone [https://github.com/Ctrl-Yam/c-web-server.git](https://github.com/Ctrl-Yam/c-web-server.git)
+   cd c-web-server
